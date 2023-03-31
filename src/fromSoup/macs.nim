@@ -15,7 +15,7 @@ proc mySep(input: string, start: int): int =
   of '-', ':': return 1
   else: return 0
 
-iterator parseMacs*(soup: string, outputSeperator = ':'): string =
+iterator parseMacs*(soup: string, outputSeperator = ':', emptyInputSeperator = false): string =
   var a,b,c,d,e,f: int
   var buf: string = ""
   var idx = 0
@@ -36,7 +36,9 @@ iterator parseMacs*(soup: string, outputSeperator = ':'): string =
         # if soup[idx..toIdx].scanf("${hexByte}$[mySep]${hexByte}$[mySep]${hexByte}$[mySep]${hexByte}$[mySep]${hexByte}$[mySep]${hexByte}", a,b,c,d,e,f):
 
         if buff.scanf("${hexByte}-${hexByte}-${hexByte}-${hexByte}-${hexByte}-${hexByte}", a,b,c,d,e,f) or
-            buff.scanf("${hexByte}:${hexByte}:${hexByte}:${hexByte}:${hexByte}:${hexByte}", a,b,c,d,e,f):
+            buff.scanf("${hexByte}:${hexByte}:${hexByte}:${hexByte}:${hexByte}:${hexByte}", a,b,c,d,e,f) or (
+              emptyInputSeperator and buff.scanf("${hexByte}${hexByte}${hexByte}${hexByte}${hexByte}${hexByte}", a,b,c,d,e,f)
+            ):
           # buf.setLen(0)
           buf = format("{{a}}{{sep}}{{b}}{{sep}}{{c}}{{sep}}{{d}}{{sep}}{{e}}{{sep}}{{f}}", {
             "sep": $outputSeperator,
@@ -67,12 +69,14 @@ iterator parseMacs*(soup: string, outputSeperator = ':'): string =
 when isMainModule and false:
   import sequtils
   # echo toSeq(parseMacs("asdfA0-AF-BD-9A-31-B5A0-AF-BD-9A-31-B5A0-AF-BD-9A-31-B5adf"))
-  echo toSeq(parseMacs("asdfA0:AF:BD:9A:31:B5adf"))
-  echo toSeq(parseMacs("asdfA0-AF-BD-9A-31-B5adf"))
+  # echo toSeq(parseMacs("asdfA0:AF:BD:9A:31:B5adf"))
+  # echo toSeq(parseMacs("asdaA0AFBD9A31B5adf", emptyInputSeperator = true))
+  # echo toSeq(parseMacs("asdfA0-AF-BD-9A-31-B5adf"))
   assert toSeq(parseMacs("asdfA0-AF-BD-9A-31-B5adf")) == @["A0:AF:BD:9A:31:B5"]
   assert toSeq(parseMacs("asdfA0:AF:BD:9A:31:B5adf")) == @["A0:AF:BD:9A:31:B5"]
   assert toSeq(parseMacs("asdfA0-AF-BD-9A-31-B5adf", outputSeperator='-')) == @["A0-AF-BD-9A-31-B5"]
   assert toSeq(parseMacs("asdfA0:AF:BD:9A:31:B5adf", outputSeperator='-')) == @["A0-AF-BD-9A-31-B5"]
+  echo toSeq(parseMacs("asdfA0:AF:BD:9A:31:B5adf", outputSeperator='-'))
   # assert toSeq(parseIps "hasjhaskh998.197.89.196jasdjkl193.197.89.196ajs193.197.89.196dklaj") == @["193.197.89.196", "193.197.89.196"]
   # assert toSeq(parseIps "hasskh196jasdjkl19.196ajs193..196dklajsdk81.") == @[]
   # assert toSeq(parseIps "93.194.255.234") == @["93.194.255.234"]

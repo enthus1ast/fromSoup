@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.3.0"
+version       = "0.4.0"
 author        = "David Krause"
 description   = "this repo contains various parsers that extract information from text (soup)"
 license       = "MIT"
